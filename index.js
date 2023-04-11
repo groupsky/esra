@@ -41,19 +41,26 @@ export const useState = (initialState) => {
   return currentCtx.obtainState(initialState)
 }
 
+export const processRunner = (callback) => {
+  const ctx = new Context()
+  return (event) => {
+    ctx.start()
+    try {
+      return callback(event)
+    } finally {
+      ctx.stop()
+    }
+  }
+}
+
 export default () => {
   const processors = []
   const queuedMessages = []
 
   const processor = ({ topic, payload }) => {
-    processors.forEach(({ topic: processorTopic, callback, ctx }) => {
+    processors.forEach(({ topic: processorTopic, runner }) => {
       if (processorTopic === topic) {
-        ctx.start()
-        try {
-          callback({ topic, payload })
-        } finally {
-          ctx.stop()
-        }
+        runner({topic, payload})
       }
     })
     return queuedMessages.splice(0)
@@ -61,7 +68,7 @@ export default () => {
 
   Object.assign(processor, {
     on: (topic, callback) => {
-      processors.push({ topic, callback, ctx: new Context() })
+      processors.push({ topic, runner: processRunner(callback) })
     },
     publish: (topic, payload) => {
       queuedMessages.push({ topic, payload })

@@ -1,4 +1,5 @@
 import { expect, test } from 'vitest'
+import { processRunner } from '../../index.js'
 import controller from './index.js'
 
 const configuration = {
@@ -8,41 +9,69 @@ const configuration = {
 }
 
 test('turns on when temperature is below target', () => {
-  const result = controller({ ...configuration, currentValue: 10, lastOutput: false })
+  const runner = processRunner(controller)
+
+  const result = runner({ ...configuration, currentValue: 10 })
+
   expect(result).toEqual(true)
 })
 
 test('turns off when temperature is above target', () => {
-  const result = controller({ ...configuration, currentValue: 30, lastOutput: true })
+  const runner = processRunner(controller)
+
+  runner({ ...configuration, currentValue: 10 })
+  const result = runner({ ...configuration, currentValue: 30 })
+
   expect(result).toEqual(false)
 })
 
 test('keeps off when temperature is above threshold', () => {
-  const result = controller({ ...configuration, currentValue: 19.5, lastOutput: false })
+  const runner = processRunner(controller)
+
+  const result = runner({ ...configuration, currentValue: 19.5 })
+
   expect(result).toEqual(false)
 })
 
 test('keeps off when temperature is at threshold', () => {
-  const result = controller({ ...configuration, currentValue: 19, lastOutput: false })
+  const runner = processRunner(controller)
+
+  const result = runner({ ...configuration, currentValue: 19 })
+
   expect(result).toEqual(false)
 })
 
 test('turns on when temperature is bellow threshold', () => {
-  const result = controller({ ...configuration, currentValue: 18.5, lastOutput: false })
+  const runner = processRunner(controller)
+
+  const result = runner({ ...configuration, currentValue: 18.5 })
+
   expect(result).toEqual(true)
 })
 
 test('keeps on when temperature is bellow threshold', () => {
-  const result = controller({ ...configuration, currentValue: 21, lastOutput: true })
+  const runner = processRunner(controller)
+
+  runner({ ...configuration, currentValue: 10 })
+  const result = runner({ ...configuration, currentValue: 21 })
+
   expect(result).toEqual(true)
 })
 
 test('keeps on when temperature is at threshold', () => {
-  const result = controller({ ...configuration, currentValue: 22, lastOutput: true })
+  const runner = processRunner(controller)
+
+  runner({ ...configuration, currentValue: 10 })
+  const result = runner({ ...configuration, currentValue: 22 })
+
   expect(result).toEqual(true)
 })
 
 test('turns off when temperature is above threshold', () => {
-  const result = controller({ ...configuration, currentValue: 23, lastOutput: true })
+  const runner = processRunner(controller)
+
+  runner({ ...configuration, currentValue: 10 })
+  const result = runner({ ...configuration, currentValue: 23 })
+
   expect(result).toEqual(false)
 })

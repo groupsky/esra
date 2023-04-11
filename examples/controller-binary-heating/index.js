@@ -1,3 +1,5 @@
+import { useState } from '../../index.js'
+
 /**
  * Heating controller that controls heating element to match target temperature by turning it off and on
  * @param {boolean} state - true if the heating is on, false otherwise
@@ -7,10 +9,11 @@
  * @param {number} offHysteresis - hysteresis for turning off
  * @return {boolean}
  */
-export default ({targetValue, currentValue, lastOutput = false, onHysteresis= 0 , offHysteresis= 0}) => {
+export default ({targetValue, currentValue, onHysteresis= 0 , offHysteresis= 0}) => {
+  const [lastOutput, setLastOutput] = useState(false)
   if (lastOutput) {
-    return currentValue <= targetValue + offHysteresis
+    return setLastOutput(currentValue <= targetValue + offHysteresis)
   } else {
-    return currentValue < targetValue - onHysteresis
+    return setLastOutput(currentValue < targetValue - onHysteresis)
   }
 }

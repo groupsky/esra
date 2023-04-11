@@ -2,13 +2,24 @@ name: Node.js CI
 
 on:
   push:
-    branches: [ main ]
+    branches: [main]
   pull_request:
-    branches: [ main ]
+    branches: [main]
 
 jobs:
-  test:
+  lint:
+    runs-on: ubuntu-latest
 
+  steps:
+    - uses: actions/checkout@v3
+    - name: Use Node.js 16.x
+      uses: actions/setup-node@v3
+      with:
+        node-version: latest
+    - run: yarn install --frozen-lockfile --non-interactive
+    - run: yarn lint
+
+  test:
     runs-on: ubuntu-latest
 
     strategy:

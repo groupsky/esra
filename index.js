@@ -28,7 +28,7 @@ class Context {
       (newState) => {
         this.states[idx] = newState
         return newState
-      }
+      },
     ]
   }
 
@@ -60,7 +60,7 @@ export default () => {
   const processor = ({ topic, payload }) => {
     processors.forEach(({ topic: processorTopic, runner }) => {
       if (processorTopic === topic) {
-        runner({topic, payload})
+        runner({ topic, payload })
       }
     })
     return queuedMessages.splice(0)
@@ -72,7 +72,7 @@ export default () => {
     },
     publish: (topic, payload) => {
       queuedMessages.push({ topic, payload })
-    }
+    },
   })
 
   return processor

@@ -1,4 +1,5 @@
 # esra
+
 Event state reducer for automation
 
 This is still a work in progress. The goal is to create a framework for building reusable automations using event sourcing and state reduction.

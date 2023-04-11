@@ -9,7 +9,7 @@ import { useState } from '../../index.js'
  * @param {number} offHysteresis - hysteresis for turning off
  * @return {boolean}
  */
-export default ({targetValue, currentValue, onHysteresis= 0 , offHysteresis= 0}) => {
+export default ({ targetValue, currentValue, onHysteresis = 0, offHysteresis = 0 }) => {
   const [lastOutput, setLastOutput] = useState(false)
   if (lastOutput) {
     return setLastOutput(currentValue <= targetValue + offHysteresis)

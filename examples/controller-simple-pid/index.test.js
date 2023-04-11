@@ -41,5 +41,5 @@ test.each([{ pvs: [0, 5, 10], outputs: [null, 16.495, 12.495] }])(
       expect(firstResult).toEqual(outputs[i])
       vi.advanceTimersByTime(1000)
     }
-  },
+  }
 )

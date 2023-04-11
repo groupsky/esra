@@ -31,10 +31,6 @@ class Context {
       },
     ]
   }
-
-  toString() {
-    return this.states.join(', ')
-  }
 }
 
 export const useState = (initialState) => {

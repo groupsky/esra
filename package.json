@@ -1,0 +1,16 @@
+{
+  "name": "event-state",
+  "version": "0.0.1",
+  "description": "Event based state management",
+  "main": "index.js",
+  "author": "Geno Roupsky",
+  "license": "MIT",
+  "type": "module",
+  "devDependencies": {
+    "vitest": "^0.30.0"
+  },
+  "scripts": {
+    "test": "vitest",
+    "coverage": "vitest run --coverage"
+  }
+}

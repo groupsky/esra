@@ -32,13 +32,8 @@ jobs:
       - run: yarn install --frozen-lockfile --non-interactive
       - run: yarn coverage
 
-      - uses: codecov/codecov-action@v2
-        with:
-          token: ${{ secrets.CODECOV_TOKEN }}
-          file: ./coverage/coverage-final.json
-          flags: unittests
-          name: codecov-umbrella
-          fail_ci_if_error: true
+      - name: Upload coverage reports to Codecov
+        uses: codecov/codecov-action@v3
 
   lint:
     runs-on: ubuntu-latest

@@ -1,75 +1,31 @@
-let currentCtx = null
+import { runWithInput } from './lib/input-context.js'
+import { runWithState } from './lib/state-context.js'
 
-class Context {
-  states = []
-  idx = 0
+export { useInput, runWithInput } from './lib/input-context.js'
+export { useState, runWithState } from './lib/state-context.js'
 
-  start() {
-    this.idx = 0
-    currentCtx = this
-  }
+export default (computation) => {
+  let recompute = false
 
-  stop() {
-    currentCtx = null
-    if (this.idx !== this.states.length) {
-      throw new Error('Not all states were used')
-    }
-  }
-
-  obtainState(initialState) {
-    if (this.idx >= this.states.length) {
-      this.states.push(initialState)
-    }
-
-    const idx = this.idx
-    this.idx++
-    return [
-      this.states[idx],
-      (newState) => {
-        this.states[idx] = newState
-        return newState
-      },
-    ]
-  }
-}
-
-export const useState = (initialState) => {
-  return currentCtx.obtainState(initialState)
-}
-
-export const processRunner = (callback) => {
-  const ctx = new Context()
-  return (event) => {
-    ctx.start()
-    try {
-      return callback(event)
-    } finally {
-      ctx.stop()
-    }
-  }
-}
-
-export default () => {
-  const processors = []
-  const queuedMessages = []
-
-  const processor = ({ topic, payload }) => {
-    processors.forEach(({ topic: processorTopic, runner }) => {
-      if (processorTopic === topic) {
-        runner({ topic, payload })
-      }
-    })
-    return queuedMessages.splice(0)
-  }
-
-  Object.assign(processor, {
-    on: (topic, callback) => {
-      processors.push({ topic, runner: processRunner(callback) })
-    },
-    publish: (topic, payload) => {
-      queuedMessages.push({ topic, payload })
-    },
+  const withState = runWithState(computation, () => {
+    console.log('recompute')
+    recompute = true
   })
 
-  return processor
+  const [withInput, handleEvent] = runWithInput(withState)
+
+  const wrappedComputation = withInput
+
+  let state = wrappedComputation()
+
+  return (event) => {
+    console.log('event', event)
+    handleEvent(event)
+    while (recompute) {
+      console.log('recomputing')
+      recompute = false
+      state = wrappedComputation()
+    }
+    return [{ topic: 'result', payload: state }]
+  }
 }

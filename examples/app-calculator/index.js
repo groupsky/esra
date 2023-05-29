@@ -1,12 +1,17 @@
-import esra, { useState } from '../..'
+import esra, { useInput, useState } from '../..'
 
-export default () => {
-  const app = esra()
+export default () =>
+  esra(() => {
+    const [state, setState] = useState(0)
 
-  app.on('sum', ({ payload }) => {
-    const [sum, setSum] = useState(0)
-    app.publish('result', setSum(sum + payload))
+    useInput('sum', ({ payload }) => {
+      console.log('onInput', payload)
+      setState((sum) => {
+        console.log('sum', sum, payload)
+        return sum + payload
+      })
+    })
+
+    console.log('state', state)
+    return state
   })
-
-  return app
-}

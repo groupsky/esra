@@ -1,7 +1,7 @@
 import { expect, test } from 'vitest'
 import appFactory from './index.js'
 
-test('returns first payload', () => {
+test.only('returns first payload', () => {
   const app = appFactory()
 
   const output = app({ topic: 'sum', payload: 1 })

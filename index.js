@@ -1,31 +1,61 @@
-import { runWithInput } from './lib/input-context.js'
+import deepTraverse from './lib/deep-traverse.js'
+import { InputContext, handleInput, runWithInput } from './lib/input-context.js'
+import { runWithOutput } from './lib/output-context.js'
 import { runWithState } from './lib/state-context.js'
 
-export { useInput, runWithInput } from './lib/input-context.js'
-export { useState, runWithState } from './lib/state-context.js'
+export {  useInput } from './lib/input-context.js'
+export { useState } from './lib/state-context.js'
 
-export default (computation) => {
-  let recompute = false
+export default (computationTree) => {
+  console.log('computationTree', computationTree)
+  const inputContext = new InputContext()
 
-  const withState = runWithState(computation, () => {
-    console.log('recompute')
-    recompute = true
+  let recomputeQueue = []
+  let outputQueue = []
+
+  const onOutput = (topic) => (payload) => outputQueue.push({topic, payload})
+
+  const deepWrap = deepTraverse((computation, path) => {
+    if (typeof computation !== 'function') {
+      return
+    }
+    const id = path.join('.')
+    console.log('wrapping', id, computation)
+    const wrapped = runWithInput(runWithState(runWithOutput(computation, onOutput(id)), () => {
+      recomputeQueue.push({id, fn: wrapped})
+    }), inputContext)
+    return wrapped
   })
 
-  const [withInput, handleEvent] = runWithInput(withState)
+  const deepRun = deepTraverse((computation, path) => {
+    if (typeof computation !== 'function') {
+      return
+    }
+    console.log('running', path.join('.'))
+    return computation()
+  })
 
-  const wrappedComputation = withInput
-
-  let state = wrappedComputation()
+  const wrapped = deepWrap(computationTree)
+  const initialState = deepRun(wrapped)
+  console.log('initialState', initialState)
 
   return (event) => {
     console.log('event', event)
-    handleEvent(event)
-    while (recompute) {
-      console.log('recomputing')
-      recompute = false
-      state = wrappedComputation()
+    recomputeQueue = []
+    outputQueue = []
+    handleInput(event, inputContext)
+    let iteration = 10
+    while (iteration > 0 && recomputeQueue.length > 0) {
+      iteration--
+      const queue = recomputeQueue
+      recomputeQueue = []
+      queue.forEach(({id, fn}) => {
+        console.log('recomputing', id)
+        fn()
+      })
     }
-    return [{ topic: 'result', payload: state }]
+    console.log('state', deepRun(wrapped))
+
+    return outputQueue
   }
 }

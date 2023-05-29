@@ -1,11 +1,15 @@
-import esra from '../..'
+import esra, { useInput, useState } from '../..'
 
-export default () => {
-  const app = esra()
+export default () => esra({
+  '/hello': () => {
+    const [input, setInput] = useState(null)
 
-  app.on('/hello', ({ topic, payload = 'world' }) => {
-    app.publish(topic, `hello ${payload} from ${topic}`)
-  })
+    useInput('/hello', (event) => {
+      setInput(event)
+    })
 
-  return app
-}
+    if (!input) return null
+
+    return `hello ${input.payload} from ${input.topic}`
+  }
+})

@@ -3,7 +3,7 @@ import { InputContext, handleInput, runWithInput } from './lib/input-context.js'
 import { runWithOutput } from './lib/output-context.js'
 import { runWithState } from './lib/state-context.js'
 
-export {  useInput } from './lib/input-context.js'
+export { useInput } from './lib/input-context.js'
 export { useState } from './lib/state-context.js'
 
 export default (computationTree) => {
@@ -13,16 +13,15 @@ export default (computationTree) => {
   let recomputeQueue = []
   let outputQueue = []
 
-  const onOutput = (topic) => (payload) => outputQueue.push({topic, payload})
+  const onOutput = (topic) => (payload) => outputQueue.push({ topic, payload })
 
   const deepWrap = deepTraverse((computation, path) => {
     if (typeof computation !== 'function') {
       return
     }
     const id = path.join('.')
-    console.log('wrapping', id, computation)
     const wrapped = runWithInput(runWithState(runWithOutput(computation, onOutput(id)), () => {
-      recomputeQueue.push({id, fn: wrapped})
+      recomputeQueue.push({ id, fn: wrapped })
     }), inputContext)
     return wrapped
   })
@@ -31,7 +30,6 @@ export default (computationTree) => {
     if (typeof computation !== 'function') {
       return
     }
-    console.log('running', path.join('.'))
     return computation()
   })
 
@@ -49,7 +47,7 @@ export default (computationTree) => {
       iteration--
       const queue = recomputeQueue
       recomputeQueue = []
-      queue.forEach(({id, fn}) => {
+      queue.forEach(({ id, fn }) => {
         console.log('recomputing', id)
         fn()
       })

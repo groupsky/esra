@@ -1,46 +1,22 @@
 import esra, { useInput, useState } from '../..'
 
-const useLightController = ({ switches, reverseSwitches, buttons }) => {
-  const [state, setState] = useState(null)
-
-  switches?.forEach((switchName) => {
-    useInput(switchName, ({ payload }) => {
-      setState(payload)
-    })
-  })
-
-  reverseSwitches?.forEach((switchName) => {
-    useInput(switchName, ({ payload }) => {
-      setState(!payload)
-    })
-  })
-
-  buttons?.forEach((buttonName) => {
-    useInput(buttonName, () => {
-      setState((state) => !state)
-    })
-  })
-
-  return state
-}
-
 export default () =>
   esra({
     light: () => {
-      const [locked, setLocked] = useState(false)
-      const state = useLightController({
-        switches: ['switch1'],
-        reverseSwitches: ['switch2'],
-        buttons: ['button1'],
+      const [state, setState] = useState(null)
+
+      useInput('switch1', ({ payload }) => {
+        setState(payload)
       })
 
-      useInput('lock', ({payload}) => {
-        setLocked(payload)
+      useInput('switch2', ({ payload }) => {
+        setState(!payload)
       })
 
-      if (locked) {
-        return true
-      }
+      useInput('button1', () => {
+        setState((state) => !state)
+      })
+
       return state
     },
   })

@@ -41,7 +41,11 @@ export default (computationTree) => {
     console.log('event', event)
     recomputeQueue = []
     outputQueue = []
-    handleInput(event, inputContext)
+    if (event) {
+      handleInput(event, inputContext)
+    } else {
+      deepRun(wrapped)
+    }
     let iteration = 10
     while (iteration > 0 && recomputeQueue.length > 0) {
       iteration--

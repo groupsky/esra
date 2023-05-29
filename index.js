@@ -6,6 +6,10 @@ import { runWithState } from './lib/state-context.js'
 export { useInput } from './lib/input-context.js'
 export { useState } from './lib/state-context.js'
 
+/**
+ * @param computationTree
+ * @returns {function(object?): object[]}
+ */
 export default (computationTree) => {
   console.log('computationTree', computationTree)
   const inputContext = new InputContext()
